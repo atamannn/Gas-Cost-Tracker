@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Gas Cost Tracker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1em;
+      max-width: 400px;
+      margin: auto;
+    }
+    input, button, label {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    #output {
+      margin-top: 1em;
+      border: 1px solid #ccc;
+      padding: 1em;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h2>Gas Cost Tracker</h2>
+
+  <label for="startOdo">Start Odometer (km)</label>
+  <input id="startOdo" type="number" />
+
+  <label for="endOdo">End Odometer (km)</label>
+  <input id="endOdo" type="number" />
+
+  <label for="gasPrice">Gas Price ($/L)</label>
+  <input id="gasPrice" type="number" step="0.01" />
+
+  <label for="consumption">Fuel Consumption (L/100km)</label>
+  <input id="consumption" type="number" step="0.1" />
+
+  <button onclick="calculate()">Calculate Cost</button>
+  <div id="output"></div>
+  <button onclick="downloadImage()">Save as Image</button>
+  <canvas id="canvas" style="display:none;"></canvas>
+
+  <script>
+    window.onload = function () {
+      const savedPrice = localStorage.getItem("gasPrice");
+      const savedConsumption = localStorage.getItem("consumption");
+
+      if (savedPrice) document.getElementById("gasPrice").value = savedPrice;
+      if (savedConsumption) document.getElementById("consumption").value = savedConsumption;
+
+      document.getElementById("gasPrice").addEventListener("input", (e) => {
+        localStorage.setItem("gasPrice", e.target.value);
+      });
+
+      document.getElementById("consumption").addEventListener("input", (e) => {
+        localStorage.setItem("consumption", e.target.value);
+      });
+    };
+
+    function calculate() {
+      const start = parseFloat(document.getElementById('startOdo').value);
+      const end = parseFloat(document.getElementById('endOdo').value);
+      const price = parseFloat(document.getElementById('gasPrice').value);
+      const consumption = parseFloat(document.getElementById('consumption').value);
+
+      if (isNaN(start) || isNaN(end) || isNaN(price) || isNaN(consumption)) {
+        alert("Please fill in all fields correctly.");
+        return;
+      }
+
+      const distance = end - start;
+      const fuelUsed = (distance * consumption) / 100;
+      const cost = fuelUsed * price;
+
+      const result = `📅 ${new Date().toLocaleDateString()}\n🚗 Distance: ${distance.toFixed(1)} km\n🛢️ Fuel Used: ${fuelUsed.toFixed(2)} L\n💸 Total Cost: $${cost.toFixed(2)}`;
+      document.getElementById("output").innerText = result;
+    }
+
+    function downloadImage() {
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const outputText = document.getElementById("output").innerText;
+
+      canvas.width = 400;
+      canvas.height = 200;
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#000";
+      ctx.font = "16px sans-serif";
+      const lines = outputText.split("\n");
+      lines.forEach((line, index) => {
+        ctx.fillText(line, 10, 30 + index * 30);
+      });
+
+      const link = document.createElement("a");
+      link.download = `gas_cost_${Date.now()}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+</body>
+</html>
