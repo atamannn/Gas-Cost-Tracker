@@ -50,18 +50,14 @@
 
   <script>
     window.onload = function () {
-      const savedPrice = localStorage.getItem("gasPrice");
-      const savedConsumption = localStorage.getItem("consumption");
+      const fields = ["startOdo", "endOdo", "gasPrice", "consumption"];
 
-      if (savedPrice) document.getElementById("gasPrice").value = savedPrice;
-      if (savedConsumption) document.getElementById("consumption").value = savedConsumption;
-
-      document.getElementById("gasPrice").addEventListener("input", (e) => {
-        localStorage.setItem("gasPrice", e.target.value);
-      });
-
-      document.getElementById("consumption").addEventListener("input", (e) => {
-        localStorage.setItem("consumption", e.target.value);
+      fields.forEach((field) => {
+        const saved = localStorage.getItem(field);
+        if (saved) document.getElementById(field).value = saved;
+        document.getElementById(field).addEventListener("input", (e) => {
+          localStorage.setItem(field, e.target.value);
+        });
       });
     };
 
