@@ -46,6 +46,7 @@
 
   <button onclick="calculate()">Calculate Cost</button>
   <button onclick="downloadImage()">Save as Image</button>
+  <button onclick="saveInputs()">Save Input Values</button>
   <button onclick="resetInputs()">Reset Inputs</button>
 
   <div id="output"></div>
@@ -61,9 +62,6 @@
       fields.forEach((field) => {
         const saved = localStorage.getItem(field);
         if (saved) document.getElementById(field).value = saved;
-        document.getElementById(field).addEventListener("input", (e) => {
-          localStorage.setItem(field, e.target.value);
-        });
       });
 
       renderHistory();
@@ -90,6 +88,14 @@
 
       saveToHistory(result);
       renderHistory();
+    }
+
+    function saveInputs() {
+      ["startOdo", "endOdo", "gasPrice", "consumption"].forEach((id) => {
+        const value = document.getElementById(id).value;
+        if (value) localStorage.setItem(id, value);
+      });
+      alert("Inputs saved successfully.");
     }
 
     function resetInputs() {
